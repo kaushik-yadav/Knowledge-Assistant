@@ -1,0 +1,19 @@
+Product Name: SmartHome Router X5
+
+- Processor: Quad-core 1.4 GHz ARM Cortex-A53
+- Ports: 4x Gigabit LAN, 1x WAN, 2x USB 3.0
+- Connectivity: Wi-Fi 6, Dual Band 2.4GHz & 5GHz
+- Security: WPA3, DoS Protection, Parental Controls
+- App Support: iOS, Android
+- Max Devices: Supports up to 50 devices
+- Antennas: 4 External Adjustable Antennas
+
+Product Name: SmartPlug Mini V2
+
+- Voltage: 100-240V AC
+- Current: 10A max
+- Features: Voice Control, Timer Scheduling, Energy Monitoring
+- Compatibility: Alexa, Google Assistant, IFTTT
+- Safety Certifications: FCC, ETL certified
+- Dimensions: 2.5 x 1.5 x 1.3 inches
+- Power Consumption: <1W (idle)

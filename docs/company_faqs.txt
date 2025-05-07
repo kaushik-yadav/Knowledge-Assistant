@@ -1,0 +1,32 @@
+Q: What services does TechSupport Inc. offer?
+A: We provide 24/7 technical support for software, hardware, and networking issues.
+
+Q: How can I contact customer service?
+A: You can reach us via email at support@techsupport.com or call 1-800-555-1234.
+
+Q: What is your return policy?
+A: We accept returns within 30 days of purchase, provided the product is in original condition and packaging.
+
+Q: Do you offer live chat support?
+A: Yes, live chat is available on our website from 9 AM to 9 PM EST, Monday through Saturday.
+
+Q: Where are your service centers located?
+A: We have service centers in over 20 cities across the US. Visit our website's "Support" section to find one near you.
+
+Q: Is there a loyalty program?
+A: Yes, customers can join our loyalty program to earn points with every purchase and redeem rewards.
+
+Q: Are your technicians certified?
+A: All our technicians hold certifications such as CompTIA A+, Network+, or Microsoft Certified Professional (MCP).
+
+Q: How quickly can I expect a response to my support ticket?
+A: Our average initial response time is under 15 minutes for urgent issues and under 2 hours for non-urgent ones.
+
+Q: Do you support business clients?
+A: Yes, we offer managed IT services and SLAs tailored for small to mid-sized businesses.
+
+Q: What are your subscription plans?
+A: We offer Basic, Pro, and Enterprise plans starting at $9.99/month. Each plan includes different levels of support and device coverage.
+
+Q: Can I cancel my subscription anytime?
+A: Yes, subscriptions can be canceled at any time from your account dashboard without penalty.
