@@ -1,0 +1,4 @@
+/venv
+.env
+/documents_index
+__pycache__
