@@ -28,7 +28,7 @@ def start_rag():
 
     # initializing the retriever to retrieve the top k relevant documents with a nearest neighbors search (fetching up to 50 candidates)
     retriever = VectorStoreRetriever(
-        vectorstore=vector_store, search_kwargs={"k": 6, "fetch_k": 50}
+        vectorstore=vector_store, search_kwargs={"k": 6, "fetch_k": 70}
     )
 
     return retriever

@@ -12,7 +12,7 @@ def run_llm_agent(retriever, query):
     llm = ChatOpenAI(
         openai_api_key=OPENAI_API_KEY,
         openai_api_base=OPENAI_API_BASE,
-        model_name="mistralai/Mistral-7B-Instruct-v0.1",
+        model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
     )
     # creating a system prompt for the agent
     system_prompt = (
@@ -37,5 +37,4 @@ def run_llm_agent(retriever, query):
 
     # executing the RAG chain
     response = rag_chain.invoke({"input": query})
-
     return response["answer"]
