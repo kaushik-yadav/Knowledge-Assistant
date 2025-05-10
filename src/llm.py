@@ -34,6 +34,26 @@ def run_llm_agent(retriever, query):
         model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
     )
 
+    # if calculation is needed
+    # ask the LLM if this is a calculation
+    calc_check_prompt = (
+        "Decide if this question requires performing a calculation. "
+        "Reply only with YES or NO.\n\n"
+        f"QUESTION: {query}"
+    )
+    should_calc = llm.invoke(calc_check_prompt).content.strip().upper()
+    if should_calc == "YES":
+        calc_prompt = (
+            "Perform this calculation and return *only* the numeric result unless the user specifies to give better context:\n"
+            f"{query}"
+        )
+        result = llm.invoke(calc_prompt).content.strip()
+        return {
+            "answer": result,
+            "tool_used": "Tool: LLM Calculator",
+            "context_snippets": [f"Calculated expression: {query} = {result}"],
+        }
+
     # creating a system prompt for the agent
     system_prompt = (
         "You are a smart assistant with access to the following abilities:\n"
