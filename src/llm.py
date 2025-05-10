@@ -6,6 +6,7 @@ from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
 
 from config import OPENAI_API_BASE, OPENAI_API_KEY, OXFORD_APP_ID, OXFORD_APP_KEY
+from src.rag import start_rag
 
 
 # using the oxform API to get definitions of words, if not found the LLM will answer on its own.
@@ -36,11 +37,10 @@ def run_llm_agent(retriever, query):
     # creating a system prompt for the agent
     system_prompt = (
         "You are a smart assistant with access to the following abilities:\n"
-        "- If the question asks for a **definition**, try to extract the term from the query and fetch the definition from the Oxford API.\n"
-        "- If the definition is not available through the API, generate the definition yourself based on your knowledge.\n"
-        "- If the question asks you to **calculate**, perform the calculation yourself and return the answer.\n"
-        "- If the question doesn't ask for a definition or calculation, use the provided context to answer the question.\n"
-        "If you cannot answer the question with the context, say 'I don't know'.\n"
+        "- If the question asks for a **definition**, you will be provided with a dictionary entry.\n"
+        "- Use the definition (if given) to format the answer as per the user's query (e.g., return multiple meanings, add explanation).\n"
+        "- If no definition is provided, use your own knowledge to answer.\n"
+        "- For other queries, use the provided context.\n"
         "Be concise. Use at most 3 sentences.\n\n"
         "Context:\n{context}"
     )
@@ -58,9 +58,6 @@ def run_llm_agent(retriever, query):
     # basically creating a RAG chain by combining the retriever and our question-answer chain
     rag_chain: Runnable = create_retrieval_chain(retriever, question_answer_chain)
 
-    # executing the RAG chain
-    response = rag_chain.invoke({"input": query})
-
     # instructing the LLM to extract the word to be defined dynamically if keywords like define are present
     if "define" in query.lower() or "definition" in query.lower():
         # ask the LLM to extract the word to be defined from the query
@@ -72,10 +69,32 @@ def run_llm_agent(retriever, query):
         if extracted_word:
             definition = get_definition(extracted_word)
             if definition:
-                return f"Definition of {extracted_word}: {definition}"
-            else:
-                print(
-                    "This definition was not present in the dictionary, I will tell you what I know :"
-                )
+                # adding a definition + llm layer to answer the questions
+                definition_context = f"Definition of {extracted_word}: {definition}"
+                final_answer = llm.invoke(
+                    f"{definition_context}\n\nNow answer the user query: '{query}'"
+                ).content.strip()
 
-    return response["answer"]
+                return {
+                    "answer": final_answer,
+                    "tool_used": "Tool: Dictionary API + LLM Formatter",
+                    "context_snippets": [definition_context],
+                }
+            else:
+                # adding a fallback if we do not find the term in dictionary
+                llm_definition = f"Define the term '{extracted_word}' and give two definitions if possible."
+                answer = llm.invoke(llm_definition).content.strip()
+                return {
+                    "answer": f"This definition was not present in the dictionary, I will tell you what I know:\n{answer}",
+                    "tool_used": "Tool: LLM generated definition",
+                    "context_snippets": ["The definition was LLM generated"],
+                }
+
+    retrieved_docs = start_rag().get_relevant_documents(query)
+    # executing the RAG chain
+    response = rag_chain.invoke({"input": query})
+    return {
+        "answer": response["answer"],
+        "tool_used": "Tool: RAG Pipeline",
+        "context_snippets": [doc.page_content for doc in retrieved_docs],
+    }
