@@ -6,3 +6,4 @@ langchain_openai==0.3.16
 python-dotenv==1.1.0
 Requests==2.32.3
 streamlit==1.45.0
+faiss-cpu>=1.7.4
