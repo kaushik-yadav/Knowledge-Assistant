@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import requests
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -6,10 +8,10 @@ from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
 
 from config import OPENAI_API_BASE, OPENAI_API_KEY, OXFORD_APP_ID, OXFORD_APP_KEY
-from src.rag import start_rag
 
 
 # using the oxform API to get definitions of words, if not found the LLM will answer on its own.
+@lru_cache(maxsize=128)
 def get_definition(word):
     url = f"https://od-api-sandbox.oxforddictionaries.com/api/v2/entries/en-us/{word.lower().strip()}"
     headers = {"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY}
@@ -25,14 +27,16 @@ def get_definition(word):
             return None
     return None
 
+# instantiate LLM once to avoid per-call overhead
+_llm = ChatOpenAI(
+    openai_api_key=OPENAI_API_KEY,
+    openai_api_base=OPENAI_API_BASE,
+    model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+)
 
 def run_llm_agent(retriever, query):
     # initiating the LLM with model name and API credentials using an OPENAI wrapper
-    llm = ChatOpenAI(
-        openai_api_key=OPENAI_API_KEY,
-        openai_api_base=OPENAI_API_BASE,
-        model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-    )
+    llm = _llm
 
     # if calculation is needed
     # ask the LLM if this is a calculation
@@ -60,7 +64,8 @@ def run_llm_agent(retriever, query):
         "- If the question asks for a **definition**, you will be provided with a dictionary entry.\n"
         "- Use the definition (if given) to format the answer as per the user's query (e.g., return multiple meanings, add explanation).\n"
         "- If no definition is provided, use your own knowledge to answer.\n"
-        "- For other queries, use the provided context.\n"
+        "- For other queries related to the provided context answered based on it.\n"
+        "- If the question is not from the provided context, and is not a calculation or definition problem then say that you are a knowledge assitant so please ask questions related to the context given or if anything related to calucaltion or definition is needed."
         "Be concise. Use at most 3 sentences.\n\n"
         "Context:\n{context}"
     )
@@ -82,7 +87,8 @@ def run_llm_agent(retriever, query):
     if "define" in query.lower() or "definition" in query.lower():
         # ask the LLM to extract the word to be defined from the query
         extracted_word_response = llm.invoke(
-            f"Extract the single word or phrase that needs to be defined from this question: '{query}'\n\nJust return the word or phrase without any explanation."
+            f"Extract the single word or phrase that needs to be defined from this question: '{query}'\n\n"
+            "Just return the word or phrase without any explanation."
         )
         extracted_word = extracted_word_response.content.strip()
         # if the definition was extracted we output it else the LLM generates on its own
@@ -110,7 +116,8 @@ def run_llm_agent(retriever, query):
                     "context_snippets": ["The definition was LLM generated"],
                 }
 
-    retrieved_docs = start_rag().get_relevant_documents(query)
+    # reuse retriever that was built once; use invoke() instead of deprecated get_relevant_documents()
+    retrieved_docs = retriever.invoke(query)
     # executing the RAG chain
     response = rag_chain.invoke({"input": query})
     return {
