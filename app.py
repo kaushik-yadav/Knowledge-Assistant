@@ -43,6 +43,9 @@ def main():
 
     result = run_llm_agent(st.session_state.retriever, query)
 
+    st.subheader("Final Answer")
+    st.write(result["answer"])
+    
     st.subheader("Tool/Agent Branch Used")
     st.write(result["tool_used"])
 
@@ -51,8 +54,7 @@ def main():
         for snippet in result["context_snippets"]:
             st.write(snippet)
 
-    st.subheader("Final Answer")
-    st.write(result["answer"])
+
 
 if __name__ == "__main__":
     main()
