@@ -27,16 +27,13 @@ def get_definition(word):
             return None
     return None
 
-# instantiate LLM once to avoid per-call overhead
-_llm = ChatOpenAI(
-    openai_api_key=OPENAI_API_KEY,
-    openai_api_base=OPENAI_API_BASE,
-    model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-)
-
 def run_llm_agent(retriever, query):
     # initiating the LLM with model name and API credentials using an OPENAI wrapper
-    llm = _llm
+    llm = ChatOpenAI(
+        openai_api_key=OPENAI_API_KEY,
+        openai_api_base=OPENAI_API_BASE,
+        model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+    )
 
     # if calculation is needed
     # ask the LLM if this is a calculation
