@@ -1,4 +1,5 @@
+__pycache__
 /venv
 .env
-/documents_index
-__pycache__
+.streamlit/secrets.toml
+/data
