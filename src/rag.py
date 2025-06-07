@@ -4,7 +4,7 @@ from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_huggingface import HuggingFaceEmbeddings
 from PyPDF2 import PdfReader
 
-from config import EMBED_MODEL_NAME, INDEX_PATH
+from constants import EMBED_MODEL_NAME, INDEX_PATH
 from utils import get_documents
 
 

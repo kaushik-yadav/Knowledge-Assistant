@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 
 import requests
@@ -7,14 +8,18 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
 
-from config import OPENAI_API_BASE, OPENAI_API_KEY, OXFORD_APP_ID, OXFORD_APP_KEY
+# load environment variables
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+openai_api_base = os.environ.get("OPENAI_API_BASE")
+oxford_app_id = os.environ.get("OXFORD_APP_ID")
+oxford_app_key = os.environ.get("OXFORD_APP_KEY")
 
 
 # using the oxform API to get definitions of words, if not found the LLM will answer on its own.
 @lru_cache(maxsize=128)
 def get_definition(word):
     url = f"https://od-api-sandbox.oxforddictionaries.com/api/v2/entries/en-us/{word.lower().strip()}"
-    headers = {"app_id": OXFORD_APP_ID, "app_key": OXFORD_APP_KEY}
+    headers = {"app_id": oxford_app_id, "app_key": oxford_app_key}
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
@@ -30,8 +35,8 @@ def get_definition(word):
 def run_llm_agent(retriever, query):
     # initiating the LLM with model name and API credentials using an OPENAI wrapper
     llm = ChatOpenAI(
-        openai_api_key=OPENAI_API_KEY,
-        openai_api_base=OPENAI_API_BASE,
+        openai_api_key=openai_api_key,
+        openai_api_base=openai_api_base,
         model_name="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
     )
 

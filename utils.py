@@ -3,7 +3,7 @@ import re
 
 from langchain.schema import Document
 
-from config import DOCS_PATH
+from constants import DOCS_PATH
 
 
 # chunking each document like {source : 'doc category', content : 'the content in category'}

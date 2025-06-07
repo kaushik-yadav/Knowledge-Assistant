@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 
-from config import DOCS_PATH
+from constants import DOCS_PATH
 from src.llm import run_llm_agent
 from src.rag import build_retriever_from_uploaded_text, extract_text_from_pdf, start_rag
 
